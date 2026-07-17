@@ -1,0 +1,13 @@
+.env*
+.openai
+.wrangler
+.vinext
+.next
+dist
+build
+backups
+contracts
+tests
+work
+outputs
+*.log
