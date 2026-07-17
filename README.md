@@ -33,18 +33,18 @@ include contract sources and must describe Market Quality as a data-screening
 score rather than a security rating. Without `OPENAI_API_KEY`, the endpoint
 fails closed and the interface clearly falls back to local screening rules.
 
+## Live product
+
+- Landing: [roven.finance](https://roven.finance/)
+- Product: [roven.finance/app](https://roven.finance/app)
+- Safety model: [roven.finance/security](https://roven.finance/security)
+
 ## Local development
 
 ```bash
 npm install
 npm run dev
 ```
-
-Open:
-
-- Landing: `http://localhost:3000/`
-- Product: `http://localhost:3000/app`
-- Safety model: `http://localhost:3000/security`
 
 ## Verification
 
