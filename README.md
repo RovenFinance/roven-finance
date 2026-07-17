@@ -56,3 +56,11 @@ npm audit --omit=dev
 
 `/api/health` returns `ready` only when live market data is available and Ask
 Roven has a server-side API key.
+
+## License
+
+The source code is licensed under the
+[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0). See
+[`LICENSE`](LICENSE) and [`NOTICE`](NOTICE) for the complete terms and
+attributions. The license does not grant permission to use the Roven Finance
+name, logos or other brand identifiers except as permitted by the license.
