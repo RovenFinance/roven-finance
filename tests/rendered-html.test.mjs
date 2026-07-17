@@ -14,7 +14,7 @@ const ctx = { waitUntil() {}, passThroughOnException() {} };
 
 async function html(path) {
   const builtWorker = await worker();
-  const response = await builtWorker.fetch(new Request(`http://localhost${path}`, { headers: { accept: "text/html" } }), env, ctx);
+  const response = await builtWorker.fetch(new Request(`https://roven.test${path}`, { headers: { accept: "text/html" } }), env, ctx);
   assert.equal(response.status, 200);
   return { response, body: await response.text() };
 }
@@ -67,7 +67,7 @@ test("active source contains no financial transaction construction", async () =>
 
 test("opportunity API returns explicit scope, timestamp and limitations", async () => {
   const builtWorker = await worker();
-  const response = await builtWorker.fetch(new Request("http://localhost/api/opportunities"), env, ctx);
+  const response = await builtWorker.fetch(new Request("https://roven.test/api/opportunities"), env, ctx);
   assert.equal(response.status, 200);
   const payload = await response.json();
   assert.ok(Array.isArray(payload.opportunities));
@@ -82,7 +82,7 @@ test("opportunity API returns explicit scope, timestamp and limitations", async 
 
 test("Ask Roven fails closed when the server key is not configured", async () => {
   const builtWorker = await worker();
-  const response = await builtWorker.fetch(new Request("http://localhost/api/ask", {
+  const response = await builtWorker.fetch(new Request("https://roven.test/api/ask", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ question: "What has the highest APY?" }),
@@ -94,7 +94,7 @@ test("Ask Roven fails closed when the server key is not configured", async () =>
 
 test("health endpoint reports degraded until deployment secrets are present", async () => {
   const builtWorker = await worker();
-  const response = await builtWorker.fetch(new Request("http://localhost/api/health"), env, ctx);
+  const response = await builtWorker.fetch(new Request("https://roven.test/api/health"), env, ctx);
   assert.equal(response.status, 503);
   const payload = await response.json();
   assert.equal(payload.status, "degraded");
