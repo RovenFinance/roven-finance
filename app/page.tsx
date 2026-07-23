@@ -116,7 +116,7 @@ export default function Home() {
     <footer id="about" className="roven-footer">
       <a className="wordmark" href="#top"><RovenMark size={31} /><strong>Roven<span>Finance</span></strong></a>
       <p>Yield intelligence for the Robinhood Chain economy.</p>
-      <div><a href="/methodology">Methodology</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/security">Safety</a><a href="/app">Open app</a></div>
+      <div><a href="/methodology">Methodology</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/security">Safety</a><a href="https://x.com/rovenfinance" target="_blank" rel="noreferrer">X</a><a href="/app">Open app</a></div>
     </footer>
   </main>;
 }

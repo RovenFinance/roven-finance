@@ -38,6 +38,7 @@ fails closed and the interface clearly falls back to local screening rules.
 - Landing: [roven.finance](https://roven.finance/)
 - Product: [roven.finance/app](https://roven.finance/app)
 - Safety model: [roven.finance/security](https://roven.finance/security)
+- X: [@RovenFinance](https://x.com/rovenfinance)
 
 ## Local development
 

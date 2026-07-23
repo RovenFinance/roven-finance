@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@RovenFinance",
+    creator: "@RovenFinance",
     title: "Roven Finance — Yield Intelligence for Robinhood Chain",
     description: "Read-only USDG yield screening with transparent data scope and contract verification.",
     images: ["/og.png"],
