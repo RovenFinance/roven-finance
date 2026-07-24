@@ -16,9 +16,17 @@ export type YieldOpportunity = {
   marketQualityLabel: MarketQualityLabel;
   screeningReasons: string[];
   listed: boolean;
+  /** Deep link into Morpho app for this vault on Robinhood Chain. */
+  protocolUrl: string;
+  /** Blockscout contract page for independent verification. */
   explorerUrl: string;
   source: "Morpho API";
 };
+
+/** Canonical Morpho Vault V2 page for Robinhood Chain (chainId 4663). */
+export function morphoVaultUrl(address: string): string {
+  return `https://app.morpho.org/robinhood/vault/${address}`;
+}
 
 export type OpportunityResponse = {
   opportunities: YieldOpportunity[];
@@ -50,6 +58,7 @@ export const FALLBACK_OPPORTUNITIES: YieldOpportunity[] = [
     marketQualityLabel: "Strong data",
     screeningReasons: ["Morpho listed", "TVL above $50M", "Liquidity above 20% of TVL", "Positive 6h average net APY"],
     listed: true,
+    protocolUrl: morphoVaultUrl("0xBeEff033F34C046626B8D0A041844C5d1A5409dd"),
     explorerUrl: "https://robinhoodchain.blockscout.com/address/0xBeEff033F34C046626B8D0A041844C5d1A5409dd",
     source: "Morpho API",
   },
@@ -69,6 +78,7 @@ export const FALLBACK_OPPORTUNITIES: YieldOpportunity[] = [
     marketQualityLabel: "Standard data",
     screeningReasons: ["Not Morpho listed", "TVL above $50M", "Liquidity above 10% of TVL", "Positive 6h average net APY"],
     listed: false,
+    protocolUrl: morphoVaultUrl("0xbEeFF0fb1Dc19344A87b8479dAb60A2e16160737"),
     explorerUrl: "https://robinhoodchain.blockscout.com/address/0xbEeFF0fb1Dc19344A87b8479dAb60A2e16160737",
     source: "Morpho API",
   },

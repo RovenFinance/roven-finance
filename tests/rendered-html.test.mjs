@@ -40,11 +40,12 @@ test("serves the Roven mark directly without an image-optimizer dependency", asy
 });
 
 test("active source contains no financial transaction construction", async () => {
-  const [app, walletData, robinhood, ask] = await Promise.all([
+  const [app, walletData, robinhood, ask, opportunities] = await Promise.all([
     readFile(new URL("../app/app/page.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/lib/wallet-data.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/lib/robinhood.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/api/ask/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/lib/opportunities.ts", import.meta.url), "utf8"),
   ]);
   assert.match(app, /Ask Roven/);
   assert.match(app, /WalletRabby/);
@@ -54,7 +55,10 @@ test("active source contains no financial transaction construction", async () =>
   assert.match(app, /WalletWalletConnect/);
   assert.match(app, /Roven never requests access to your private keys/);
   assert.match(app, /wallet_revokePermissions/);
+  assert.match(app, /Open on Morpho/);
   assert.match(app, /Verify contract/);
+  assert.match(app, /protocolUrl/);
+  assert.match(opportunities, /app\.morpho\.org\/robinhood\/vault/);
   assert.match(walletData, /eth_call/);
   assert.match(robinhood, /4663/);
   assert.match(ask, /OPENAI_API_KEY/);
@@ -74,6 +78,8 @@ test("opportunity API returns explicit scope, timestamp and limitations", async 
   assert.ok(payload.opportunities.length >= 1);
   assert.ok(payload.opportunities.every((item) => item.asset === "USDG"));
   assert.ok(payload.opportunities.every((item) => Number.isFinite(item.marketQualityScore)));
+  assert.ok(payload.opportunities.every((item) => /^https:\/\/app\.morpho\.org\/robinhood\/vault\/0x[a-fA-F0-9]{40}$/i.test(item.protocolUrl)));
+  assert.ok(payload.opportunities.every((item) => item.protocolUrl.toLowerCase().includes(item.id.toLowerCase())));
   assert.match(payload.dataScope, /Morpho Vault V2/);
   assert.match(payload.snapshotAt, /^\d{4}-\d{2}-\d{2}T/);
   assert.ok(Array.isArray(payload.limitations) && payload.limitations.length >= 3);

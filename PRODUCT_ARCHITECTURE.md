@@ -14,8 +14,9 @@ opportunities and explains tradeoffs. It never receives financial authority.
 4. Normalize net APY, TVL, available liquidity and listing status.
 5. Calculate a transparent Market Quality score that is explicitly not a security rating.
 6. Present comparisons and Ask Roven explanations.
-7. Link the user to Blockscout and the underlying protocol for independent
-   verification and direct execution.
+7. Link the user to the exact Morpho vault page on Robinhood Chain
+   (`app.morpho.org/robinhood/vault/<address>`) and Blockscout for independent
+   verification. Execution remains on Morpho — Roven never constructs a deposit.
 
 ## Trust boundaries
 

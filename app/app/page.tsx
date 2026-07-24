@@ -377,6 +377,11 @@ export default function RovenIntelligence() {
   }
 
   function openOpportunity(opportunity: YieldOpportunity) {
+    record("Opened on Morpho", `${opportunity.name} · ${shortAddress(opportunity.id)}`);
+    window.open(opportunity.protocolUrl, "_blank", "noopener,noreferrer");
+  }
+
+  function verifyOpportunity(opportunity: YieldOpportunity) {
     record("Contract reviewed", `${opportunity.name} · ${shortAddress(opportunity.id)}`);
     window.open(opportunity.explorerUrl, "_blank", "noopener,noreferrer");
   }
@@ -389,12 +394,12 @@ export default function RovenIntelligence() {
   }
 
   let panel: React.ReactNode;
-  if (active === "Discover") panel = <Discover opportunities={opportunities} loading={loading} selected={selected} onCompare={toggleCompare} onOpen={openOpportunity} />;
+  if (active === "Discover") panel = <Discover opportunities={opportunities} loading={loading} selected={selected} onCompare={toggleCompare} onOpen={openOpportunity} onVerify={verifyOpportunity} />;
   else if (active === "Compare") panel = <Compare opportunities={opportunities.filter((item) => selected.includes(item.id))} onDiscover={() => setActive("Discover")} />;
   else if (active === "Portfolio") panel = <Portfolio address={address} balance={walletBalance} correctNetwork={correctNetwork} onConnect={requestWalletConnection} onSwitch={switchNetwork} />;
   else if (active === "Activity") panel = <ActivityPanel history={history} />;
   else if (active === "Safety") panel = <Safety />;
-  else panel = <Overview opportunities={opportunities} loading={loading} data={opportunityData} onDiscover={() => setActive("Discover")} onAsk={() => setAgentOpen(true)} onOpen={openOpportunity} />;
+  else panel = <Overview opportunities={opportunities} loading={loading} data={opportunityData} onDiscover={() => setActive("Discover")} onAsk={() => setAgentOpen(true)} onOpen={openOpportunity} onVerify={verifyOpportunity} />;
 
   return (
     <main className="roven-app intelligence-app">
@@ -474,13 +479,13 @@ function Title({ eyebrow, title, description, actions }: { eyebrow: string; titl
   return <div className="app-page-title intel-title"><div><span>{eyebrow}</span><h1>{title}</h1><p>{description}</p></div>{actions && <div>{actions}</div>}</div>;
 }
 
-function Overview({ opportunities, loading, data, onDiscover, onAsk, onOpen }: { opportunities: YieldOpportunity[]; loading: boolean; data: OpportunityResponse; onDiscover(): void; onAsk(): void; onOpen(item: YieldOpportunity): void }) {
+function Overview({ opportunities, loading, data, onDiscover, onAsk, onOpen, onVerify }: { opportunities: YieldOpportunity[]; loading: boolean; data: OpportunityResponse; onDiscover(): void; onAsk(): void; onOpen(item: YieldOpportunity): void; onVerify(item: YieldOpportunity): void }) {
   const strongestData = [...opportunities].sort((a, b) => b.marketQualityScore - a.marketQualityScore)[0];
   const highest = [...opportunities].sort((a, b) => b.netApy - a.netApy)[0];
   const liquidity = opportunities.reduce((sum, item) => sum + item.liquidityUsd, 0);
   return <>
     <Title eyebrow="Robinhood Chain yield intelligence" title="Know where your money could work." description="Roven screens the monitored Morpho USDG set, normalizes yield and explains observable tradeoffs. You independently verify every destination." actions={<><button className="soft-action" onClick={onAsk}><Sparkles size={13} />Ask Roven</button><button className="solid-action" onClick={onDiscover}>Explore opportunities <ArrowRight size={13} /></button></>} />
-    <div className="read-only-banner"><ShieldCheck size={15} /><span><strong>No custody. No approvals. No hidden execution.</strong> Roven reads public data and sends you to the underlying protocol only after showing the source and risks.</span></div>
+    <div className="read-only-banner"><ShieldCheck size={15} /><span><strong>No custody. No approvals. No hidden execution.</strong> Roven reads public data and sends you to Morpho for the matching vault — deposits stay on the protocol, never in Roven.</span></div>
     {data.sourceStatus === "stale" && <div className="stale-data-warning" role="alert"><CircleAlert size={15} /><span><strong>Live source unavailable.</strong> Values below come from the snapshot dated {snapshotTime(data.snapshotAt)}. Do not make a decision without refreshing and independently verifying the contracts.</span></div>}
     <div className="intel-kpis">
       <div><span>Screened opportunities</span><strong>{loading ? "—" : opportunities.length}</strong><small>{data.dataScope}</small></div>
@@ -489,14 +494,14 @@ function Overview({ opportunities, loading, data, onDiscover, onAsk, onOpen }: {
       <div><span>Strongest market data</span><strong>{strongestData ? `${strongestData.marketQualityScore}/100` : "—"}</strong><small>Not a security rating</small></div>
     </div>
     {strongestData && <div className="featured-opportunity">
-      <div className="featured-copy"><span className="roven-pick"><Sparkles size={12} />Strongest observable data</span><h2>{strongestData.name}</h2><p>The strongest combination of listing status, scale, reported liquidity and APY sanity checks in the monitored set. This is not an endorsement.</p><div className="feature-tags"><span><ShieldCheck size={12} />{strongestData.marketQualityLabel}</span><span><Gauge size={12} />{strongestData.liquidityRatio.toFixed(1)}% liquid</span><span><RefreshCw size={12} />{data.sourceStatus === "live" ? "Live source" : "Stale snapshot"}</span></div><button onClick={() => onOpen(strongestData)}>Verify contract <ExternalLink size={13} /></button></div>
+      <div className="featured-copy"><span className="roven-pick"><Sparkles size={12} />Strongest observable data</span><h2>{strongestData.name}</h2><p>The strongest combination of listing status, scale, reported liquidity and APY sanity checks in the monitored set. This is not an endorsement.</p><div className="feature-tags"><span><ShieldCheck size={12} />{strongestData.marketQualityLabel}</span><span><Gauge size={12} />{strongestData.liquidityRatio.toFixed(1)}% liquid</span><span><RefreshCw size={12} />{data.sourceStatus === "live" ? "Live source" : "Stale snapshot"}</span></div><div className="featured-actions"><button className="solid-action" onClick={() => onOpen(strongestData)}>Open on Morpho <ExternalLink size={13} /></button><button className="soft-action" onClick={() => onVerify(strongestData)}>Verify contract <ExternalLink size={13} /></button></div></div>
       <div className="featured-metrics"><div><span>Net APY</span><strong>{strongestData.netApy.toFixed(2)}%</strong></div><div><span>Total deposits</span><strong>{money(strongestData.tvlUsd)}</strong></div><div><span>Reported liquidity</span><strong>{money(strongestData.liquidityUsd)}</strong></div><div><span>Market Quality</span><strong>{strongestData.marketQualityScore}<small>/100</small></strong></div></div>
     </div>}
     <div className="intel-method"><Info size={14} /><span>{data.methodology} Version {data.methodologyVersion}.</span><Link href="/methodology">Full methodology <ArrowRight size={11} /></Link></div>
   </>;
 }
 
-function Discover({ opportunities, loading, selected, onCompare, onOpen }: { opportunities: YieldOpportunity[]; loading: boolean; selected: string[]; onCompare(id: string): void; onOpen(item: YieldOpportunity): void }) {
+function Discover({ opportunities, loading, selected, onCompare, onOpen, onVerify }: { opportunities: YieldOpportunity[]; loading: boolean; selected: string[]; onCompare(id: string): void; onOpen(item: YieldOpportunity): void; onVerify(item: YieldOpportunity): void }) {
   return <>
     <Title eyebrow="Opportunity explorer" title="Compare yield without the noise." description="Every result is canonical USDG on Robinhood Chain and passes Roven’s transparent listing or TVL screen." actions={<button className="soft-action" aria-label="Current filter: USDG, all market quality levels"><ListFilter size={13} />USDG · All quality levels</button>} />
     <div className="opportunity-table">
@@ -508,11 +513,11 @@ function Discover({ opportunities, loading, selected, onCompare, onOpen }: { opp
           <span>{money(item.tvlUsd)}</span>
           <span>{money(item.liquidityUsd)}<small>{item.liquidityRatio.toFixed(1)}% of TVL</small></span>
           <span className={`risk-pill ${item.marketQualityLabel.startsWith("Strong") ? "lower" : item.marketQualityLabel.startsWith("Standard") ? "moderate" : "elevated"}`}>{item.marketQualityLabel}<small>{item.marketQualityScore}/100 · not security</small></span>
-          <div className="row-actions"><button aria-label={`${selected.includes(item.id) ? "Remove" : "Add"} ${item.name} ${selected.includes(item.id) ? "from" : "to"} comparison`} className={selected.includes(item.id) ? "selected" : ""} onClick={() => onCompare(item.id)}>{selected.includes(item.id) ? <Check size={12} /> : "Compare"}</button><button aria-label={`Verify ${item.name} contract on Blockscout`} onClick={() => onOpen(item)}><ExternalLink size={12} /></button></div>
+          <div className="row-actions"><button aria-label={`${selected.includes(item.id) ? "Remove" : "Add"} ${item.name} ${selected.includes(item.id) ? "from" : "to"} comparison`} className={selected.includes(item.id) ? "selected" : ""} onClick={() => onCompare(item.id)}>{selected.includes(item.id) ? <Check size={12} /> : "Compare"}</button><button aria-label={`Open ${item.name} on Morpho`} onClick={() => onOpen(item)} title="Open on Morpho"><ExternalLink size={12} /></button><button aria-label={`Verify ${item.name} contract on Blockscout`} onClick={() => onVerify(item)} title="Verify on Blockscout"><ShieldCheck size={12} /></button></div>
         </div>
       ))}
     </div>
-    <div className="discovery-disclosure"><CircleAlert size={14} /><p><strong>Screened does not mean verified, approved or safe.</strong><span>Rates are variable. Smart-contract, curator, adapter, underlying market, liquidity, oracle, governance and collateral risks remain outside the Market Quality score.</span></p></div>
+    <div className="discovery-disclosure"><CircleAlert size={14} /><p><strong>Screened does not mean verified, approved or safe.</strong><span>Rates are variable. Smart-contract, curator, adapter, underlying market, liquidity, oracle, governance and collateral risks remain outside the Market Quality score. “Open on Morpho” deep-links the exact vault address on Robinhood Chain.</span></p></div>
   </>;
 }
 
@@ -530,7 +535,7 @@ function Compare({ opportunities, onDiscover }: { opportunities: YieldOpportunit
   ];
   return <>
     <Title eyebrow="Side-by-side comparison" title="See the tradeoff, not just the rate." description="Roven keeps yield, scale, liquidity and listing status visible in one decision surface." />
-    <div className="compare-grid"><div className="compare-labels"><span>Metric</span>{rows.map((row) => <p key={row[0]}>{row[0]}</p>)}</div>{[a,b].map((item, index) => <div className={`compare-card ${item.marketQualityScore === Math.max(a.marketQualityScore, b.marketQualityScore) ? "recommended" : ""}`} key={item.id}>{item.marketQualityScore === Math.max(a.marketQualityScore, b.marketQualityScore) && <span className="compare-recommendation"><Sparkles size={10} />Stronger data</span>}<div className="compare-name"><span className="morpho-symbol">M</span><div><strong>{item.name}</strong><small>{item.symbol}</small></div></div>{rows.map((row) => <p key={row[0]}>{row[index + 1]}</p>)}<a href={item.explorerUrl} target="_blank" rel="noreferrer">Verify contract <ExternalLink size={12} /></a></div>)}</div>
+    <div className="compare-grid"><div className="compare-labels"><span>Metric</span>{rows.map((row) => <p key={row[0]}>{row[0]}</p>)}</div>{[a,b].map((item, index) => <div className={`compare-card ${item.marketQualityScore === Math.max(a.marketQualityScore, b.marketQualityScore) ? "recommended" : ""}`} key={item.id}>{item.marketQualityScore === Math.max(a.marketQualityScore, b.marketQualityScore) && <span className="compare-recommendation"><Sparkles size={10} />Stronger data</span>}<div className="compare-name"><span className="morpho-symbol">M</span><div><strong>{item.name}</strong><small>{item.symbol}</small></div></div>{rows.map((row) => <p key={row[0]}>{row[index + 1]}</p>)}<div className="compare-links"><a href={item.protocolUrl} target="_blank" rel="noreferrer">Open on Morpho <ExternalLink size={12} /></a><a href={item.explorerUrl} target="_blank" rel="noreferrer">Verify contract <ExternalLink size={12} /></a></div></div>)}</div>
   </>;
 }
 

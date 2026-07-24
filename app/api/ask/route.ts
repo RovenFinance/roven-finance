@@ -140,10 +140,10 @@ Keep the answer under 170 words and end with: "Bilgilendirme amaçlıdır; finan
       mode: "ai",
       snapshotAt: marketData.snapshotAt,
       sourceStatus: marketData.sourceStatus,
-      sources: marketData.opportunities.map((item) => ({
-        label: `${item.name} contract`,
-        url: item.explorerUrl,
-      })),
+      sources: marketData.opportunities.flatMap((item) => [
+        { label: `${item.name} on Morpho`, url: item.protocolUrl },
+        { label: `${item.name} contract`, url: item.explorerUrl },
+      ]),
     }, { headers: { "cache-control": "no-store" } });
   } catch {
     return Response.json({ error: "Ask Roven is temporarily unavailable.", code: "AI_UPSTREAM_ERROR" }, {

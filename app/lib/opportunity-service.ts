@@ -1,6 +1,7 @@
 import {
   FALLBACK_OPPORTUNITIES,
   FALLBACK_SNAPSHOT_AT,
+  morphoVaultUrl,
   type MarketQualityLabel,
   type OpportunityResponse,
   type YieldOpportunity,
@@ -125,6 +126,7 @@ function transform(vault: MorphoVault): YieldOpportunity {
     marketQualityLabel: marketQuality.label,
     screeningReasons: marketQuality.reasons,
     listed: vault.listed,
+    protocolUrl: morphoVaultUrl(vault.address),
     explorerUrl: `https://robinhoodchain.blockscout.com/address/${vault.address}`,
     source: "Morpho API",
   };
