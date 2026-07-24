@@ -9,12 +9,12 @@ import {
 
 const USDG = "0x5fc5360d0400a0fd4f2af552add042d716f1d168";
 const MORPHO_API = "https://api.morpho.org/graphql";
-const METHODOLOGY_VERSION = "2026-07-16.1";
+const METHODOLOGY_VERSION = "2026-07-24.1";
 let liveCache: { value: OpportunityResponse; expiresAt: number } | null = null;
 const QUERY = `query {
   vaultV2s(first: 100, where: { chainId_in: [4663] }) {
     items {
-      address name symbol listed avgNetApy avgNetApyExcludingRewards
+      address name symbol listed netApy netApyExcludingRewards
       totalAssetsUsd liquidityUsd
       asset { address symbol decimals }
       chain { id network }
@@ -27,8 +27,9 @@ type MorphoVault = {
   name: string;
   symbol: string;
   listed: boolean;
-  avgNetApy: number | null;
-  avgNetApyExcludingRewards: number | null;
+  /** Morpho Instant Net APY (after fees, with rewards) — same field Morpho UI labels Net APY. */
+  netApy: number | null;
+  netApyExcludingRewards: number | null;
   totalAssetsUsd: number | null;
   liquidityUsd: number | null;
   asset: { address: string; symbol: string; decimals: number };
@@ -54,8 +55,8 @@ function isMorphoVault(value: unknown): value is MorphoVault {
     typeof item.name === "string" &&
     typeof item.symbol === "string" &&
     typeof item.listed === "boolean" &&
-    (item.avgNetApy === null || isFiniteNumber(item.avgNetApy)) &&
-    (item.avgNetApyExcludingRewards === null || isFiniteNumber(item.avgNetApyExcludingRewards)) &&
+    (item.netApy === null || isFiniteNumber(item.netApy)) &&
+    (item.netApyExcludingRewards === null || isFiniteNumber(item.netApyExcludingRewards)) &&
     (item.totalAssetsUsd === null || isFiniteNumber(item.totalAssetsUsd)) &&
     (item.liquidityUsd === null || isFiniteNumber(item.liquidityUsd)) &&
     Boolean(item.asset && typeof item.asset.address === "string" && typeof item.asset.symbol === "string") &&
@@ -67,7 +68,7 @@ function quality(vault: MorphoVault) {
   const tvl = Math.max(0, vault.totalAssetsUsd ?? 0);
   const liquidity = Math.max(0, vault.liquidityUsd ?? 0);
   const ratio = tvl > 0 ? liquidity / tvl : 0;
-  const apy = (vault.avgNetApy ?? 0) * 100;
+  const apy = (vault.netApy ?? 0) * 100;
   const reasons: string[] = [];
   let score = 10;
 
@@ -98,7 +99,7 @@ function quality(vault: MorphoVault) {
   }
   if (apy > 0 && apy < 15) {
     score += 10;
-    reasons.push("Positive 6h average net APY");
+    reasons.push("Positive Morpho instant net APY");
   }
 
   const normalized = Math.min(score, 100);
@@ -117,8 +118,8 @@ function transform(vault: MorphoVault): YieldOpportunity {
     symbol: vault.symbol || "Vault",
     asset: "USDG",
     assetAddress: vault.asset.address,
-    netApy: Math.max(0, (vault.avgNetApy ?? 0) * 100),
-    baseApy: Math.max(0, (vault.avgNetApyExcludingRewards ?? 0) * 100),
+    netApy: Math.max(0, (vault.netApy ?? 0) * 100),
+    baseApy: Math.max(0, (vault.netApyExcludingRewards ?? 0) * 100),
     tvlUsd: tvl,
     liquidityUsd: liquidity,
     liquidityRatio: tvl > 0 ? (liquidity / tvl) * 100 : 0,
@@ -165,7 +166,7 @@ export async function getOpportunityResponse(): Promise<OpportunityResponse> {
       .filter((item) =>
         item.asset.address.toLowerCase() === USDG &&
         (item.listed || (item.totalAssetsUsd ?? 0) >= 10_000_000) &&
-        (item.avgNetApy ?? 0) > 0
+        (item.netApy ?? 0) > 0
       )
       .map(transform)
       .sort((a, b) => b.marketQualityScore - a.marketQualityScore || b.netApy - a.netApy);

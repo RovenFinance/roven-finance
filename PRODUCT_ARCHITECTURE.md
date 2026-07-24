@@ -11,7 +11,7 @@ opportunities and explains tradeoffs. It never receives financial authority.
 1. Fetch public vault data from a supported protocol source.
 2. Restrict results to Robinhood Chain and canonical USDG.
 3. Exclude negative-yield and very small results while visibly marking unlisted vaults.
-4. Normalize net APY, TVL, available liquidity and listing status.
+4. Normalize Morpho Instant Net APY, TVL, available liquidity and listing status.
 5. Calculate a transparent Market Quality score that is explicitly not a security rating.
 6. Present comparisons and Ask Roven explanations.
 7. Link the user to the exact Morpho vault page on Robinhood Chain

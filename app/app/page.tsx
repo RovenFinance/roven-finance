@@ -489,7 +489,7 @@ function Overview({ opportunities, loading, data, onDiscover, onAsk, onOpen, onV
     {data.sourceStatus === "stale" && <div className="stale-data-warning" role="alert"><CircleAlert size={15} /><span><strong>Live source unavailable.</strong> Values below come from the snapshot dated {snapshotTime(data.snapshotAt)}. Do not make a decision without refreshing and independently verifying the contracts.</span></div>}
     <div className="intel-kpis">
       <div><span>Screened opportunities</span><strong>{loading ? "—" : opportunities.length}</strong><small>{data.dataScope}</small></div>
-      <div><span>Highest monitored net APY</span><strong>{highest ? `${highest.netApy.toFixed(2)}%` : "—"}</strong><small>Variable 6h average, not guaranteed</small></div>
+      <div><span>Highest monitored net APY</span><strong>{highest ? `${highest.netApy.toFixed(2)}%` : "—"}</strong><small>Morpho instant net, variable</small></div>
       <div><span>Reported liquidity</span><strong>{money(liquidity)}</strong><small>Across the monitored set</small></div>
       <div><span>Strongest market data</span><strong>{strongestData ? `${strongestData.marketQualityScore}/100` : "—"}</strong><small>Not a security rating</small></div>
     </div>
@@ -509,7 +509,7 @@ function Discover({ opportunities, loading, selected, onCompare, onOpen, onVerif
       {loading ? <div className="opportunity-loading"><RefreshCw size={16} />Refreshing screened markets…</div> : opportunities.map((item) => (
         <div className="opportunity-row" key={item.id}>
           <div className="opportunity-name"><span className="morpho-symbol">M</span><span><strong>{item.name}</strong><small>{item.protocol} · {item.symbol}{item.listed && <b>Listed</b>}</small></span></div>
-          <strong className="apy-cell">{item.netApy.toFixed(2)}%<small>6h avg. net</small></strong>
+          <strong className="apy-cell">{item.netApy.toFixed(2)}%<small>Instant net</small></strong>
           <span>{money(item.tvlUsd)}</span>
           <span>{money(item.liquidityUsd)}<small>{item.liquidityRatio.toFixed(1)}% of TVL</small></span>
           <span className={`risk-pill ${item.marketQualityLabel.startsWith("Strong") ? "lower" : item.marketQualityLabel.startsWith("Standard") ? "moderate" : "elevated"}`}>{item.marketQualityLabel}<small>{item.marketQualityScore}/100 · not security</small></span>
@@ -526,7 +526,7 @@ function Compare({ opportunities, onDiscover }: { opportunities: YieldOpportunit
   const [a, b] = opportunities;
   const rows = [
     ["Net APY", `${a.netApy.toFixed(2)}%`, `${b.netApy.toFixed(2)}%`],
-    ["Base APY", `${a.baseApy.toFixed(2)}%`, `${b.baseApy.toFixed(2)}%`],
+    ["Net APY excl. rewards", `${a.baseApy.toFixed(2)}%`, `${b.baseApy.toFixed(2)}%`],
     ["Total deposits", money(a.tvlUsd), money(b.tvlUsd)],
     ["Available liquidity", money(a.liquidityUsd), money(b.liquidityUsd)],
     ["Liquidity / TVL", `${a.liquidityRatio.toFixed(1)}%`, `${b.liquidityRatio.toFixed(1)}%`],
