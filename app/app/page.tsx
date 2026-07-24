@@ -191,7 +191,7 @@ export default function RovenIntelligence() {
     fetchedAt: FALLBACK_SNAPSHOT_AT,
     snapshotAt: FALLBACK_SNAPSHOT_AT,
     sourceStatus: "stale",
-    methodologyVersion: "2026-07-16.1",
+    methodologyVersion: "2026-07-24.1",
     methodology: "Loading screened opportunity data.",
     dataScope: "Morpho Vault V2 · Robinhood Chain · canonical USDG",
     limitations: [],
