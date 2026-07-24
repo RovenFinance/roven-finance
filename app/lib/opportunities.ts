@@ -25,7 +25,8 @@ export type YieldOpportunity = {
 
 /** Canonical Morpho Vault V2 page for Robinhood Chain (chainId 4663). */
 export function morphoVaultUrl(address: string): string {
-  return `https://app.morpho.org/robinhood/vault/${address}`;
+  // Morpho app uses chainIdentifier "robinhood-chain" (not "robinhood").
+  return `https://app.morpho.org/robinhood-chain/vault/${address}`;
 }
 
 export type OpportunityResponse = {

@@ -58,7 +58,7 @@ test("active source contains no financial transaction construction", async () =>
   assert.match(app, /Open on Morpho/);
   assert.match(app, /Verify contract/);
   assert.match(app, /protocolUrl/);
-  assert.match(opportunities, /app\.morpho\.org\/robinhood\/vault/);
+  assert.match(opportunities, /app\.morpho\.org\/robinhood-chain\/vault/);
   assert.match(walletData, /eth_call/);
   assert.match(robinhood, /4663/);
   assert.match(ask, /OPENAI_API_KEY/);
@@ -78,7 +78,7 @@ test("opportunity API returns explicit scope, timestamp and limitations", async 
   assert.ok(payload.opportunities.length >= 1);
   assert.ok(payload.opportunities.every((item) => item.asset === "USDG"));
   assert.ok(payload.opportunities.every((item) => Number.isFinite(item.marketQualityScore)));
-  assert.ok(payload.opportunities.every((item) => /^https:\/\/app\.morpho\.org\/robinhood\/vault\/0x[a-fA-F0-9]{40}$/i.test(item.protocolUrl)));
+  assert.ok(payload.opportunities.every((item) => /^https:\/\/app\.morpho\.org\/robinhood-chain\/vault\/0x[a-fA-F0-9]{40}$/i.test(item.protocolUrl)));
   assert.ok(payload.opportunities.every((item) => item.protocolUrl.toLowerCase().includes(item.id.toLowerCase())));
   assert.match(payload.dataScope, /Morpho Vault V2/);
   assert.match(payload.snapshotAt, /^\d{4}-\d{2}-\d{2}T/);
